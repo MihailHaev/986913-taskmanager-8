@@ -336,10 +336,8 @@ function doFilterCard() {
   const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
   for (let i = 0 ; i < random; i++) {
-    const card = document.createElement(`div`);
-    card.innerHTML = makeTaskCard(getRandomElementOfArray(arrayOfText),
-    getRandomElementOfArray(arrayOfColor), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(),getRandomBoolean());
-    boardTasks.appendChild(card);
+    boardTasks.insertAdjacentHTML(`beforeend`,makeTaskCard(getRandomElementOfArray(arrayOfText),
+    getRandomElementOfArray(arrayOfColor), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(),getRandomBoolean()));
   }
 }
 
@@ -351,39 +349,21 @@ sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`repeating`, 2));
 sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`tags`, 6));
 sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`archive`, 115));
 
-const card1 = document.createElement('div');
-const card2 = document.createElement('div');
-const card3 = document.createElement('div');
-const card4 = document.createElement('div');
-const card5 = document.createElement('div');
-const card6 = document.createElement('div');
-const card7 = document.createElement('div');
 
-card1.innerHTML = makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false);
-card2.innerHTML = makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false);
-card3.innerHTML = makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false);
-card4.innerHTML = makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false);
-card5.innerHTML = makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false);
-card6.innerHTML = makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false);
-card7.innerHTML = makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false);
-// text, color, img, date, repeat, hashtag, deadline
-// boardTasks.insertAdjacentElement(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-// `black`, false, false, false, false, false));
-
-boardTasks.appendChild(card1);
-boardTasks.appendChild(card2);
-boardTasks.appendChild(card3);
-boardTasks.appendChild(card4);
-boardTasks.appendChild(card5);
-boardTasks.appendChild(card6);
-boardTasks.appendChild(card7);
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
+`black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
+`black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
+`black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
+`black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
+`black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
+`black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
+`black`, false, false, false, false, false));
 
 const filters = document.querySelectorAll('.filter__label');
 
