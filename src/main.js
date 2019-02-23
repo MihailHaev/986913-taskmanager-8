@@ -318,7 +318,7 @@ ${text}</textarea
   </form>
 </article>`;
 
-function doFilterCard() {
+const doFilterCard = () => {
   boardTasks.innerHTML = ``;
   const arrayOfText = [`This is example of new task, you can    add picture, set date and time, add tags.`,
     `It is example of repeating task. It marks by wave.`,
@@ -369,4 +369,6 @@ const filters = document.querySelectorAll('.filter__label');
 
 filters.forEach((el) => {
   el.addEventListener(`click`, doFilterCard);
-})
+});
+
+var mihal = 'miha';
