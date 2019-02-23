@@ -370,5 +370,3 @@ const filters = document.querySelectorAll('.filter__label');
 filters.forEach((el) => {
   el.addEventListener(`click`, doFilterCard);
 });
-
-var mihal = 'miha';
