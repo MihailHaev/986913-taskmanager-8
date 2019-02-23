@@ -1,3 +1,5 @@
+'use strict';
+
 const sectionForFilters = document.querySelector(`.main__filter`);
 const boardTasks = document.querySelector(`.board__tasks`);
 
@@ -17,11 +19,10 @@ const doFilterCard = () => {
 
   const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
-  for (let i = 0 ; i < random; i++) {
-    boardTasks.insertAdjacentHTML(`beforeend`,makeTaskCard(getRandomElementOfArray(arrayOfText),
-    getRandomElementOfArray(arrayOfColor), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(),getRandomBoolean()));
+  for (let i = 0; i < random; i++) {
+    boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(getRandomElementOfArray(arrayOfText), getRandomElementOfArray(arrayOfColor), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean()));
   }
-}
+};
 
 const makeFilter = (caption, amount, isChecked = false) => `<input
 type="radio"
@@ -37,11 +38,6 @@ ${amount === 0 ? `disabled` : ``}
 ${caption} <span class="filter__${caption.toLowerCase()}-count">${amount}</span></label
 >`;
 
-// color can be black yellow blue green pink 
-  // date format
-  // 23 september
-  // 11:15 PM
-  // Reapeat days: mo, tu, we, th, fr, sa, su
 const makeTaskCard = (text, color, img, date, repeat, hashtag, deadline) => `<article
   class="card card--${color.toLowerCase()} ${repeat ? `card--repeat` : ``} ${deadline ? `card--deadline` : ``}">
   <form class="card__form" method="get">
@@ -233,7 +229,7 @@ ${text}</textarea
             <button type="button" class="card__hashtag-delete">
               delete
             </button>
-          </span>`: ``}
+          </span>` : ``}
             </div>
 
             <label>
@@ -269,7 +265,7 @@ ${text}</textarea
               class="card__color-input card__color-input--black visually-hidden"
               name="color"
               value="black"
-              ${color == `black` ? `checked` : ``}
+              ${color === `black` ? `checked` : ``}
             />
             <label
               for="color-black-2"
@@ -282,7 +278,7 @@ ${text}</textarea
               class="card__color-input card__color-input--yellow visually-hidden"
               name="color"
               value="yellow"
-              ${color == `yellow` ? `checked` : ``}
+              ${color === `yellow` ? `checked` : ``}
             />
             <label
               for="color-yellow-2"
@@ -295,7 +291,7 @@ ${text}</textarea
               class="card__color-input card__color-input--blue visually-hidden"
               name="color"
               value="blue"
-              ${color == `blue` ? `checked` : ``}
+              ${color === `blue` ? `checked` : ``}
             />
             <label
               for="color-blue-2"
@@ -308,7 +304,7 @@ ${text}</textarea
               class="card__color-input card__color-input--green visually-hidden"
               name="color"
               value="green"
-              ${color == `green` ? `checked` : ``}
+              ${color === `green` ? `checked` : ``}
             />
             <label
               for="color-green-2"
@@ -321,7 +317,7 @@ ${text}</textarea
               class="card__color-input card__color-input--pink visually-hidden"
               name="color"
               value="pink"
-              ${color == `pink` ? `checked` : ``}
+              ${color === `pink` ? `checked` : ``}
             />
             <label
               for="color-pink-2"
@@ -340,30 +336,23 @@ ${text}</textarea
   </form>
 </article>`;
 
-sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`all`, 15, true));
-sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`overdue`, 0));
-sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`today`, 0));
-sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`favorites`, 7));
-sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`repeating`, 2));
-sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`tags`, 6));
-sectionForFilters.insertAdjacentHTML('beforeend', makeFilter(`archive`, 115));
+sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`all`, 15, true));
+sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`overdue`, 0));
+sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`today`, 0));
+sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`favorites`, 7));
+sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`repeating`, 2));
+sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`tags`, 6));
+sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`archive`, 115));
 
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`,
-`black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
 
-const filters = document.querySelectorAll('.filter__label');
+const filters = document.querySelectorAll(`.filter__label`);
 
 filters.forEach((el) => {
   el.addEventListener(`click`, doFilterCard);
