@@ -2,26 +2,26 @@
 
 const sectionForFilters = document.querySelector(`.main__filter`);
 const boardTasks = document.querySelector(`.board__tasks`);
+const textsForTaskCard = [`This is example of new task, you can add picture, set date and time, add tags.`, `It is example of repeating task. It marks by wave.`, `This is card with missing deadline`, `Here is a card with filled data`, ``];
+const colorsForTaskCard = [`black`, `pink`, `yellow`, `blue`, `green`];
+
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+const getRandomElementOfArray = (array) => array[Math.floor(Math.random() * array.length)];
+const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
 const doFilterCard = () => {
   boardTasks.innerHTML = ``;
-  const arrayOfText = [`This is example of new task, you can    add picture, set date and time, add tags.`,
-    `It is example of repeating task. It marks by wave.`,
-    `This is card with missing deadline`,
-    `Here is a card with filled data`,
-    ``,
-  ];
-  const arrayOfColor = [`black`, `pink`, `yellow`, `blue`, `green`];
+  const arrayOfHTMLRandomLengthRandomCard = new Array(getRandomInt(0, 15)).fill(``).map(() => makeTaskCard({
+    text: getRandomElementOfArray(textsForTaskCard),
+    color: getRandomElementOfArray(colorsForTaskCard),
+    img: getRandomBoolean(),
+    gate: getRandomBoolean(),
+    repeat: getRandomBoolean(),
+    hashtag: getRandomBoolean(),
+    deadline: getRandomBoolean()
+  }));
 
-  const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
-  const getRandomElementOfArray = (array) => array[Math.floor(Math.random() * array.length)];
-  const random = getRandomInt(0, 15);
-
-  const getRandomBoolean = () => Boolean(Math.round(Math.random()));
-
-  for (let i = 0; i < random; i++) {
-    boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(getRandomElementOfArray(arrayOfText), getRandomElementOfArray(arrayOfColor), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean()));
-  }
+  boardTasks.insertAdjacentHTML(`beforeend`, arrayOfHTMLRandomLengthRandomCard);
 };
 
 const makeFilter = (caption, amount, isChecked = false) => `<input
@@ -38,7 +38,7 @@ ${amount === 0 ? `disabled` : ``}
 ${caption} <span class="filter__${caption.toLowerCase()}-count">${amount}</span></label
 >`;
 
-const makeTaskCard = (text, color, img, date, repeat, hashtag, deadline) => `<article
+const makeTaskCard = ({text, color, img = false, date = false, repeat = false, hashtag = false, deadline = false}) => `<article
   class="card card--${color.toLowerCase()} ${repeat ? `card--repeat` : ``} ${deadline ? `card--deadline` : ``}">
   <form class="card__form" method="get">
     <div class="card__inner">
@@ -336,24 +336,28 @@ ${text}</textarea
   </form>
 </article>`;
 
-sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`all`, 15, true));
-sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`overdue`, 0));
-sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`today`, 0));
-sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`favorites`, 7));
-sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`repeating`, 2));
-sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`tags`, 6));
-sectionForFilters.insertAdjacentHTML(`beforeend`, makeFilter(`archive`, 115));
+const exampleOfCard = {
+  text: getRandomElementOfArray(textsForTaskCard),
+  color: getRandomElementOfArray(colorsForTaskCard),
+  img: getRandomBoolean(),
+  gate: getRandomBoolean(),
+  repeat: getRandomBoolean(),
+  hashtag: getRandomBoolean(),
+  deadline: getRandomBoolean()
+};
 
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
-boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCard(`This is example of new task, you can add picture, set date and time, add tags.`, `black`, false, false, false, false, false));
+const arrayOfHTMLFilters = [makeFilter(`all`, getRandomInt(0, 15), true),
+  makeFilter(`overdue`, getRandomInt(0, 15)),
+  makeFilter(`today`, getRandomInt(0, 15)),
+  makeFilter(`favorites`, getRandomInt(0, 15)),
+  makeFilter(`repeating`, getRandomInt(0, 15)),
+  makeFilter(`tags`, getRandomInt(0, 15)),
+  makeFilter(`archive`, getRandomInt(0, 15))];
+const arrayOfHTMLCard = new Array(7).fill(``).map(() => makeTaskCard(exampleOfCard));
+
+sectionForFilters.insertAdjacentHTML(`beforeend`, arrayOfHTMLFilters);
+boardTasks.insertAdjacentHTML(`beforeend`, arrayOfHTMLCard);
 
 const filters = document.querySelectorAll(`.filter__label`);
 
-filters.forEach((el) => {
-  el.addEventListener(`click`, doFilterCard);
-});
+filters.forEach((el) => el.addEventListener(`click`, doFilterCard));
