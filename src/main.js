@@ -9,7 +9,7 @@ const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min
 const getRandomElementOfArray = (array) => array[Math.floor(Math.random() * array.length)];
 const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
-const doFilterCard = () => {
+const doFilterCards = () => {
   boardTasks.innerHTML = ``;
   const arrayOfHTMLRandomLengthRandomCard = new Array(getRandomInt(0, 15)).fill(``).map(() => makeTaskCard({
     text: getRandomElementOfArray(textsForTaskCard),
@@ -353,11 +353,11 @@ const arrayOfHTMLFilters = [makeFilter(`all`, getRandomInt(0, 15), true),
   makeFilter(`repeating`, getRandomInt(0, 15)),
   makeFilter(`tags`, getRandomInt(0, 15)),
   makeFilter(`archive`, getRandomInt(0, 15))];
-const arrayOfHTMLCard = new Array(7).fill(``).map(() => makeTaskCard(exampleOfCard));
+const arrayOfHTMLCards = new Array(7).fill(``).map(() => makeTaskCard(exampleOfCard));
 
 sectionForFilters.insertAdjacentHTML(`beforeend`, arrayOfHTMLFilters);
-boardTasks.insertAdjacentHTML(`beforeend`, arrayOfHTMLCard);
+boardTasks.insertAdjacentHTML(`beforeend`, arrayOfHTMLCards);
 
 const filters = document.querySelectorAll(`.filter__label`);
 
-filters.forEach((el) => el.addEventListener(`click`, doFilterCard));
+filters.forEach((el) => el.addEventListener(`click`, doFilterCards));
