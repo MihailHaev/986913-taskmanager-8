@@ -29,8 +29,10 @@ const arrayOfHTMLCards = new Array(7).fill().map(() => makeTaskCard(exampleOfCar
 sectionForFilters.insertAdjacentHTML(`beforeend`, arrayOfHTMLFilters.join(``));
 boardTasks.insertAdjacentHTML(`beforeend`, arrayOfHTMLCards.join(``));
 
-const filters = document.querySelectorAll(`.filter__label`);
+sectionForFilters.insertAdjacentHTML(`beforeend`, arrayOfHTMLFilters);
+boardTasks.insertAdjacentHTML(`beforeend`, arrayOfHTMLCard);
 
+const filters = document.querySelectorAll(`.filter__label`);
 const doFilterCards = () => {
   boardTasks.innerHTML = ``;
   const arrayOfHTMLRandomLengthRandomCard = new Array(getRandomInt(0, 15)).fill().map(() => makeTaskCard({
@@ -46,4 +48,4 @@ const doFilterCards = () => {
   boardTasks.insertAdjacentHTML(`beforeend`, arrayOfHTMLRandomLengthRandomCard.join(``));
 };
 
-filters.forEach((el) => el.addEventListener(`click`, doFilterCards));
+filters.forEach((el) => el.addEventListener(`click`, doFilterCard));
