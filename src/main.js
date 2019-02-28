@@ -1,5 +1,5 @@
-import makeFilter from './make-filter';
-import makeTaskCard from './make-task-card';
+import makeFilter from './filter';
+import makeTaskCard from './task-card';
 import {getRandomBoolean, getRandomElementOfArray, getRandomInt} from './random-values';
 
 const sectionForFilters = document.querySelector(`.main__filter`);

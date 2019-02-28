@@ -1,5 +1,5 @@
-import {inputInLabel, inputDay, inputColor} from './do-input-html';
-import doHashtag from './do-hashtag';
+import {inputInLabel, inputDay, inputColor} from './input-for-task';
+import doHashtag from './hashtag';
 
 export default ({text, color, img = false, date = false, repeat = false, hashtag = false, deadline = false}) => `<article
   class="card card--${color.toLowerCase()} ${repeat ? `card--repeat` : ``} ${deadline ? `card--deadline` : ``}">
