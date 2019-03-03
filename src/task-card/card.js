@@ -31,6 +31,7 @@ export default ({title, dueDate = false, tags, picture, color, repeatingDays, is
     hour: `numeric`,
     minute: `numeric`
   });
+
   let date = dateTime.split(`,`)[1].trim().split(` `);
   [date[1], date[0]] = [date[0], date[1]];
   date = date.join(` `);

@@ -1,6 +1,5 @@
 import makeFilter from './task-card/filter';
-import makeTaskCard from './task-card/task-card';
-import makeTaskInfo from './task-card/info';
+import makeTaskCards from './task-card/cards';
 import {getRandomInt} from './random-values';
 
 const sectionForFilters = document.querySelector(`.main__filter`);
@@ -13,17 +12,14 @@ const arrayOfHTMLFilters = [makeFilter(`all`, getRandomInt(0, 15), true),
   makeFilter(`repeating`, getRandomInt(0, 15)),
   makeFilter(`tags`, getRandomInt(0, 15)),
   makeFilter(`archive`, getRandomInt(0, 15))];
-const arrayOfHTMLCards = new Array(7).fill().map(() => makeTaskCard(makeTaskInfo()));
 
 sectionForFilters.insertAdjacentHTML(`beforeend`, arrayOfHTMLFilters.join(``));
-boardTasks.insertAdjacentHTML(`beforeend`, arrayOfHTMLCards.join(``));
+boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCards(7));
 
 const filters = document.querySelectorAll(`.filter__label`);
 const doFilterCards = () => {
   boardTasks.innerHTML = ``;
-  const arrayOfHTMLRandomLengthRandomCard = new Array(getRandomInt(0, 15)).fill().map(() => makeTaskCard(makeTaskInfo()));
-
-  boardTasks.insertAdjacentHTML(`beforeend`, arrayOfHTMLRandomLengthRandomCard.join(``));
+  boardTasks.insertAdjacentHTML(`beforeend`, makeTaskCards(getRandomInt(0, 15)));
 };
 
 filters.forEach((el) => el.addEventListener(`click`, doFilterCards));
