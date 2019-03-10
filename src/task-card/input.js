@@ -19,17 +19,24 @@ ${isChecked ? `checked` : ``}
 >${name}</label
 >`;
 
-const inputColor = (color, isChecked) => `<input
+const inputColor = (color, isColor) =>{
+  if (color === isColor) {
+    isColor = true;
+  } else {
+    isColor = false;
+  }
+  return `<input
 type="radio"
 id="color-${color}-2"
 class="card__color-input card__color-input--${color} visually-hidden"
 name="color"
 value="${color}"
-${isChecked ? `checked` : ``}
+${isColor ? `checked` : ``}
 />
 <label
 for="color-${color}-2"
 class="card__color card__color--${color}"
 >${color}</label
 >`;
+};
 export {inputInLabel, inputDay, inputColor};
