@@ -119,11 +119,11 @@ ${title}</titlearea
         <div class="card__colors-inner">
           <h3 class="card__colors-title">Color</h3>
           <div class="card__colors-wrap">
-            ${inputColor(`black`, `${color === `black`}`)}
-            ${inputColor(`black`, `${color === `yellow`}`)}
-            ${inputColor(`black`, `${color === `blue`}`)}
-            ${inputColor(`black`, `${color === `green`}`)}
-            ${inputColor(`black`, `${color === `pinl`}`)}
+            ${inputColor(`black`, color)}
+            ${inputColor(`black`, color)}
+            ${inputColor(`black`, color)}
+            ${inputColor(`black`, color)}
+            ${inputColor(`black`, color)}
           </div>
         </div>
       </div>
