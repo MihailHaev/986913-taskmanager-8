@@ -1,9 +1,10 @@
 import {inputInLabel, inputDay, inputColor} from './input';
 import doHashtag from './hashtag';
-import createElement from '../element';
+import Component from '../component';
 
-class TaskEdit {
+class TaskEdit extends Component {
   constructor({title, dueDate = false, tags, picture, color, repeatingDays, isFavorite = false, isDone = false}) {
+    super();
     this._title = title;
     this._dueDate = dueDate;
     this._tags = tags;
@@ -13,9 +14,11 @@ class TaskEdit {
     this._isDone = isDone;
     this._isFavorite = isFavorite;
     this._element = null;
+
     this._state = {
     };
 
+    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onSubmit = null;
   }
 
@@ -60,10 +63,6 @@ class TaskEdit {
     if (typeof this._onSubmit === `function`) {
       this._onSubmit();
     }
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onSubmit(fn) {
@@ -169,24 +168,14 @@ class TaskEdit {
   </article>`.trim();
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
   bind() {
     this._element.querySelector(`.card__form`)
-      .addEventListener(`submit`, this._onSubmitButtonClick.bind(this));
+      .addEventListener(`submit`, this._onSubmitButtonClick);
   }
 
   unbind() {
     this._element.querySelector(`.card__form`)
-      .removeEventListener(`submit`, this._onSubmitButtonClick.bind(this));
+      .removeEventListener(`submit`, this._onSubmitButtonClick);
   }
 }
 

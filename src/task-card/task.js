@@ -1,9 +1,10 @@
 import {inputInLabel} from './input';
 import doHashtag from './hashtag';
-import createElement from '../element';
+import Component from '../component';
 
-class Task {
+class Task extends Component {
   constructor({title, dueDate = false, tags, picture, color, repeatingDays, isFavorite = false, isDone = false}) {
+    super();
     this._title = title;
     this._dueDate = dueDate;
     this._tags = tags;
@@ -13,10 +14,11 @@ class Task {
     this._isDone = isDone;
     this._isFavorite = isFavorite;
     this._element = null;
+
     this._state = {
 
     };
-
+    this._onEditButtonClick = this._onEditButtonClick.bind(this);
     this._onEdit = null;
   }
 
@@ -60,10 +62,6 @@ class Task {
     if (typeof this._onEdit === `function`) {
       this._onEdit();
     }
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onEdit(fn) {
@@ -132,24 +130,14 @@ class Task {
   </article>`.trim();
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
   bind() {
     this._element.querySelector(`.card__btn--edit`)
-      .addEventListener(`click`, this._onEditButtonClick.bind(this));
+      .addEventListener(`click`, this._onEditButtonClick);
   }
 
   unbind() {
     this._element.querySelector(`.card__btn--edit`)
-      .removeEventListener(`click`, this._onEditButtonClick.bind(this));
+      .removeEventListener(`click`, this._onEditButtonClick);
   }
 }
 
