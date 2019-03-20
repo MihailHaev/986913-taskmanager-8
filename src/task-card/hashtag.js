@@ -8,7 +8,7 @@ export default (text) => `<span class="card__hashtag-inner">
             <button type="button" class="card__hashtag-name">
               #${text}
             </button>
-            <button type="button" class="card__hashtag-delete">
+            <button type="button" class="card__hashtag-delete" data-name="${text}">
               delete
             </button>
           </span>`;

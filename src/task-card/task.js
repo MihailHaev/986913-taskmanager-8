@@ -1,9 +1,9 @@
 import {inputInLabel} from './input';
-import doHashtag from './hashtag';
-import createElement from '../element';
+import MainTask from './main-task';
 
-class Task {
-  constructor({title, dueDate = false, tags, picture, color, repeatingDays, isFavorite = false, isDone = false}) {
+class Task extends MainTask {
+  constructor({title, dueDate, tags, picture, color, repeatingDays, isFavorite = false, isDone = false}) {
+    super();
     this._title = title;
     this._dueDate = dueDate;
     this._tags = tags;
@@ -12,48 +12,12 @@ class Task {
     this._repeatingDays = repeatingDays;
     this._isDone = isDone;
     this._isFavorite = isFavorite;
-    this._element = null;
-    this._state = {
+    this._onEditButtonClick = this._onEditButtonClick.bind(this);
 
-    };
+    this._state.isDate = !!dueDate;
+    this._state.isRepeated = this._isRepeated();
 
     this._onEdit = null;
-  }
-
-  _isRepeated() {
-    return Object.values(this._repeatingDays).some((it) => it === true);
-  }
-
-  _isDeadLine() {
-    return (this._dueDate < new Date());
-  }
-
-  _addTags() {
-    const tagsHTML = [];
-    [...this._tags].forEach((el, i) => {
-      tagsHTML[i] = doHashtag(el);
-    });
-    return tagsHTML.join(``);
-  }
-
-  _doDate(nameOfDate) {
-    const formatDate = new Date(this._dueDate).toLocaleString(`en-US`, {
-      year: `numeric`,
-      month: `long`,
-      day: `numeric`,
-      weekday: `long`,
-      timezone: `UTC`,
-      hour: `numeric`,
-      minute: `numeric`
-    });
-    if (nameOfDate === `date`) {
-      let date = formatDate.split(`,`)[1].trim().split(` `);
-      [date[1], date[0]] = [date[0], date[1]];
-      return date.join(` `);
-    } else if (nameOfDate === `time`) {
-      return formatDate.split(`,`)[3].trim();
-    }
-    return false;
   }
 
   _onEditButtonClick() {
@@ -62,17 +26,13 @@ class Task {
     }
   }
 
-  get element() {
-    return this._element;
-  }
-
   set onEdit(fn) {
     this._onEdit = fn;
   }
 
   get template() {
     return `<article
-    class="card card--${this._color.toLowerCase()} ${this._isRepeated() ? `card--repeat` : ``} ${this._isDeadLine() ? `card--deadline` : ``} ${this._isDone ? `done` : ``}">
+    class="card card--${this._color.toLowerCase()} ${this._state.isRepeated ? `card--repeat` : ``} ${this._isDeadLine() ? `card--deadline` : ``} ${this._isDone ? `done` : ``}">
     <form class="card__form" method="get">
       <div class="card__inner">
         <div class="card__control">
@@ -94,21 +54,21 @@ class Task {
             <use xlink:href="#wave"></use>
           </svg>
         </div>
-        <div class="card__titlearea-wrap">
-          <label>
-            <titlearea
-              class="card__title"
-              placeholder="Start typing your title here..."
-              name="title"
-            >
-  ${this._title}</titlearea
-            >
-          </label>
-        </div>
+        <div class="card__textarea-wrap">
+                  <label>
+                    <textarea
+                      class="card__text"
+                      placeholder="Start typing your text here..."
+                      name="text"
+                    >
+${this._title}</textarea
+                    >
+                  </label>
+                </div>
         <div class="card__settings">
           <div class="card__details">
             <div class="card__dates">
-              <fieldset class="card__date-deadline" ${this._dueDate ? `` : `disabled`}>
+              <fieldset class="card__date-deadline" ${this._state.isDate ? `` : `disabled`}>
                 ${inputInLabel(`card__input-deadline-wrap`, `card__date`, this._doDate(`date`), `date`)}
                 ${inputInLabel(`card__input-deadline-wrap`, `card__time`, this._doDate(`time`), `time`)}
               </fieldset>
@@ -132,24 +92,14 @@ class Task {
   </article>`.trim();
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
   bind() {
     this._element.querySelector(`.card__btn--edit`)
-      .addEventListener(`click`, this._onEditButtonClick.bind(this));
+      .addEventListener(`click`, this._onEditButtonClick);
   }
 
   unbind() {
     this._element.querySelector(`.card__btn--edit`)
-      .removeEventListener(`click`, this._onEditButtonClick.bind(this));
+      .removeEventListener(`click`, this._onEditButtonClick);
   }
 }
 

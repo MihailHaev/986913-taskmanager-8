@@ -1,9 +1,11 @@
 import {inputInLabel, inputDay, inputColor} from './input';
-import doHashtag from './hashtag';
-import createElement from '../element';
+import flatpickr from 'flatpickr';
+import moment from 'moment';
+import MainTask from './main-task';
 
-class TaskEdit {
-  constructor({title, dueDate = false, tags, picture, color, repeatingDays, isFavorite = false, isDone = false}) {
+class TaskEdit extends MainTask {
+  constructor({title, dueDate, tags, picture, color, repeatingDays, isFavorite = false, isDone = false}) {
+    super();
     this._title = title;
     this._dueDate = dueDate;
     this._tags = tags;
@@ -12,62 +14,145 @@ class TaskEdit {
     this._repeatingDays = repeatingDays;
     this._isDone = isDone;
     this._isFavorite = isFavorite;
-    this._element = null;
-    this._state = {
-    };
+
+    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+    this._onChangeDate = this._onChangeDate.bind(this);
+    this._onChangeRepeated = this._onChangeRepeated.bind(this);
+    this._onDelTag = this._onDelTag.bind(this);
+    this._onPickColor = this._onPickColor.bind(this);
+    this._onChangeRepeatedDay = this._onChangeRepeatedDay.bind(this);
+    this._onChangeDateAndTime = this._onChangeDateAndTime.bind(this);
+    this._onChangeFavorites = this._onChangeFavorites.bind(this);
+    this._onAddTag = this._onAddTag.bind(this);
+    this._onChangeText = this._onChangeText.bind(this);
+
+    this._state.isDate = false;
+    this._state.isRepeated = this._isRepeated();
 
     this._onSubmit = null;
   }
 
-  _isRepeated() {
-    return Object.values(this._repeatingDays).some((it) => it === true);
+  _onChangeDate() {
+    this._state.isDate = !this._state.isDate;
+    this._partialUpdate();
   }
 
-  _isDeadLine() {
-    return (this._dueDate < new Date());
+  _onChangeRepeated() {
+    this._state.isRepeated = !this._state.isRepeated;
+    this._partialUpdate();
   }
 
-  _addTags() {
-    const tagsHTML = [];
-    [...this._tags].forEach((el, i) => {
-      tagsHTML[i] = doHashtag(el);
-    });
-    return tagsHTML.join(``);
-  }
-
-  _doDate(nameOfDate) {
-    const formatDate = new Date(this._dueDate).toLocaleString(`en-US`, {
-      year: `numeric`,
-      month: `long`,
-      day: `numeric`,
-      weekday: `long`,
-      timezone: `UTC`,
-      hour: `numeric`,
-      minute: `numeric`
-    });
-    if (nameOfDate === `date`) {
-      let date = formatDate.split(`,`)[1].trim().split(` `);
-      [date[1], date[0]] = [date[0], date[1]];
-      return date.join(` `);
-    } else if (nameOfDate === `time`) {
-      return formatDate.split(`,`)[3].trim();
+  _onDelTag(el) {
+    if (el.target.classList.contains(`card__hashtag-delete`)) {
+      this._tags.delete(el.target.dataset.name);
+      this._partialUpdate();
     }
-    return false;
+  }
+
+  _onPickColor(el) {
+    if (el.target.tagName === `LABEL`) {
+      this._color = el.target.textContent;
+      this._partialUpdate();
+    }
+  }
+  _onChangeRepeatedDay(el) {
+    if (el.path[1].classList.contains(`card__repeat-days-inner`)) {
+      this._repeatingDays[el.target.textContent] = !this._repeatingDays[el.target.textContent];
+      this._state.isRepeated = this._isRepeated();
+      if (!this._isRepeated) {
+        this._partialUpdate();
+      }
+    }
+  }
+  _onChangeDateAndTime(el) {
+    if (el.target.classList.contains(`card__date`)) {
+      const [date, month] = el.target.value.split(` `);
+      this._dueDate = moment(this._dueDate).set({date, month}).toDate();
+      this._partialUpdate();
+    }
+    if (el.target.classList.contains(`card__time`)) {
+      const [minAndHours, a] = el.target.value.split(` `);
+      let [hour, minute] = minAndHours.split(`:`);
+      if (a.toLowerCase() === `pm`) {
+        hour = +hour;
+        if (hour !== 12) {
+          hour += 12;
+        }
+      }
+      this._dueDate = moment(this._dueDate).set({minute, hour}).toDate();
+    }
+  }
+
+  _onChangeFavorites() {
+    this._isFavorite = !this._isFavorite;
+    this._partialUpdate();
+  }
+
+  _onAddTag(el) {
+    if (el.target.value.trim() === ``) {
+      return;
+    }
+    this._tags.add(el.target.value);
+    this._partialUpdate();
+  }
+
+  _onChangeText(el) {
+    this._title = el.target.value;
   }
 
   _onSubmitButtonClick(evt) {
     evt.preventDefault();
-    if (typeof this._onSubmit === `function`) {
-      this._onSubmit();
-    }
+    const formData = new FormData(this._element.querySelector(`.card__form`));
+    const newData = this._processForm(formData);
+    this._state.isDate = false;
+    this._onSubmit(newData);
   }
 
-  get element() {
-    return this._element;
+  _processForm(formData) {
+    const entry = {
+      title: ``,
+      dueDate: this._dueDate,
+      tags: new Set(),
+      color: ``,
+      repeatingDays: {mo: false,
+        we: false,
+        tu: false,
+        th: false,
+        fr: false,
+        sa: false,
+        su: false
+      },
+      isFavorite: false,
+    };
+
+    const taskEditMapper = TaskEdit.createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      if (taskEditMapper[property]) {
+        taskEditMapper[property](value);
+      }
+    }
+    if (!this._state.isDate) {
+      entry.dueDate = false;
+    }
+    if (!this._state.isRepeated) {
+      entry.repeatingDays = {mo: false,
+        we: false,
+        tu: false,
+        th: false,
+        fr: false,
+        sa: false,
+        su: false,
+      };
+    }
+    return entry;
   }
 
   set onSubmit(fn) {
-    this._onSubmit = fn;
+    if (typeof fn === `function`) {
+      this._onSubmit = fn;
+    }
   }
 
   get template() {
@@ -94,39 +179,39 @@ class TaskEdit {
             <use xlink:href="#wave"></use>
           </svg>
         </div>
-        <div class="card__titlearea-wrap">
-          <label>
-            <titlearea
-              class="card__title"
-              placeholder="Start typing your title here..."
-              name="title"
-            >
-  ${this._title}</titlearea
-            >
-          </label>
-        </div>
+        <div class="card__textarea-wrap">
+                  <label>
+                    <textarea
+                      class="card__text"
+                      placeholder="Start typing your text here..."
+                      name="text"
+                    >
+${this._title}</textarea
+                    >
+                  </label>
+                </div>
         <div class="card__settings">
           <div class="card__details">
             <div class="card__dates">
               <button class="card__date-deadline-toggle" type="button">
-                date: <span class="card__date-status">${this._dueDate ? `yes` : `no`}</span>
+                date: <span class="card__date-status">${this._state.isDate ? `yes` : `no`}</span>
               </button>
-              <fieldset class="card__date-deadline" ${this._dueDate ? `` : `disabled`}>
+              <fieldset class="card__date-deadline" ${this._state.isDate ? `` : `disabled`}>
                 ${inputInLabel(`card__input-deadline-wrap`, `card__date`, this._doDate(`date`), `date`)}
                 ${inputInLabel(`card__input-deadline-wrap`, `card__time`, this._doDate(`time`), `time`)}
               </fieldset>
               <button class="card__repeat-toggle" type="button">
-                repeat:<span class="card__repeat-status">${this._isRepeated ? `yes` : `no`}</span>
+                repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
               </button>
-              <fieldset class="card__repeat-days" ${this._isRepeated ? `` : `disabled`}>
+              <fieldset class="card__repeat-days" ${this._state.isRepeated ? `` : `disabled`}>
                 <div class="card__repeat-days-inner">
-                  ${inputDay(`mo`, this._repeatingDays[`Mo`])}
-                  ${inputDay(`tu`, this._repeatingDays[`Tu`])}
-                  ${inputDay(`we`, this._repeatingDays[`We`])}
-                  ${inputDay(`th`, this._repeatingDays[`Th`])}
-                  ${inputDay(`fr`, this._repeatingDays[`Fr`])}
-                  ${inputDay(`sa`, this._repeatingDays[`Sa`])}
-                  ${inputDay(`su`, this._repeatingDays[`Su`])}
+                  ${inputDay(`mo`, this._repeatingDays[`mo`])}
+                  ${inputDay(`tu`, this._repeatingDays[`tu`])}
+                  ${inputDay(`we`, this._repeatingDays[`we`])}
+                  ${inputDay(`th`, this._repeatingDays[`th`])}
+                  ${inputDay(`fr`, this._repeatingDays[`fr`])}
+                  ${inputDay(`sa`, this._repeatingDays[`sa`])}
+                  ${inputDay(`su`, this._repeatingDays[`su`])}
                 </div>
               </fieldset>
             </div>
@@ -169,24 +254,58 @@ class TaskEdit {
   </article>`.trim();
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
   bind() {
     this._element.querySelector(`.card__form`)
-      .addEventListener(`submit`, this._onSubmitButtonClick.bind(this));
+      .addEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__hashtag-list`).addEventListener(`click`, this._onDelTag);
+    this._element.querySelector(`.card__colors-wrap`).addEventListener(`click`, this._onPickColor);
+    this._element.querySelector(`.card__date-deadline-toggle`).addEventListener(`click`, this._onChangeDate);
+    this._element.querySelector(`.card__repeat-toggle`).addEventListener(`click`, this._onChangeRepeated);
+    this._element.querySelector(`.card__btn--favorites`).addEventListener(`click`, this._onChangeFavorites);
+    this._element.querySelector(`.card__hashtag-input`).addEventListener(`focusout`, this._onAddTag);
+    this._element.querySelector(`.card__text`).addEventListener(`focusout`, this._onChangeText);
+    if (this._state.isDate) {
+      flatpickr(`.card__date`, {altInput: true, altFormat: `j F`, dateFormat: `j F`});
+      flatpickr(`.card__time`, {enableTime: true, noCalendar: true, altInput: true, altFormat: `h:i K`, dateFormat: `h:i K`});
+      this._element.querySelector(`.card__date-deadline`).addEventListener(`change`, this._onChangeDateAndTime);
+    }
+    if (this._state.isRepeated) {
+      this._element.querySelector(`.card__repeat-days`).addEventListener(`click`, this._onChangeRepeatedDay);
+    }
   }
 
   unbind() {
     this._element.querySelector(`.card__form`)
-      .removeEventListener(`submit`, this._onSubmitButtonClick.bind(this));
+      .removeEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__hashtag-list`).removeEventListener(`click`, this._onDelTag);
+    this._element.querySelector(`.card__colors-wrap`).removeEventListener(`click`, this._onPickColor);
+    this._element.querySelector(`.card__date-deadline-toggle`).removeEventListener(`click`, this._onChangeDate);
+    this._element.querySelector(`.card__repeat-toggle`).removeEventListener(`click`, this._onChangeRepeated);
+    this._element.querySelector(`.card__btn--favorites`).removeEventListener(`click`, this._onChangeFavorites);
+    this._element.querySelector(`.card__hashtag-input`).removeEventListener(`focusout`, this._onAddTag);
+    this._element.querySelector(`.card__text`).removeEventListener(`focusout`, this._onChangeText);
+    if (this._state.isDate) {
+      this._element.querySelector(`.card__date-deadline`).removeEventListener(`change`, this._onChangeDateAndTime);
+    }
+    if (this._state.isRepeated) {
+      this._element.querySelector(`.card__repeat-days`).removeEventListener(`click`, this._onChangeRepeatedDay);
+    }
+  }
+
+  static createMapper(target) {
+    return {
+      hashtag: (value) => target.tags.add(value),
+      text: (value) => {
+        target.title = value;
+      },
+      color: (value) => {
+        target.color = value;
+      },
+      repeat: (value) => {
+        target.repeatingDays[value] = true;
+      },
+      date: (value) => target.dueDate[value],
+    };
   }
 }
 
