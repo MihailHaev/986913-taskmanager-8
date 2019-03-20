@@ -29,6 +29,7 @@ class TaskEdit extends MainTask {
     this._state.isDate = false;
     this._state.isRepeated = this._isRepeated();
 
+    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onSubmit = null;
   }
 

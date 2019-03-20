@@ -12,6 +12,7 @@ class Task extends MainTask {
     this._repeatingDays = repeatingDays;
     this._isDone = isDone;
     this._isFavorite = isFavorite;
+
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
 
     this._state.isDate = !!dueDate;
