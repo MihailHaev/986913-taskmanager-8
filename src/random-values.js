@@ -19,8 +19,8 @@ const getRandomElementOfSet = (set, count = false) => {
 
 const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
-const getRandomDate = (dayPlus, dayMinus) => new Date((Date.now()
+const getRandomDate = (dayPlus, dayMinus) => (Date.now()
   + (Math.floor(Math.random() * dayPlus * 24 * 60) * 60 * 1000)
-  - (Math.floor(Math.random() * dayMinus * 24 * 60) * 60 * 1000)));
+  - (Math.floor(Math.random() * dayMinus * 24 * 60) * 60 * 1000));
 
 export {getRandomBoolean, getRandomElementOfArray, getRandomInt, getRandomElementOfSet, getRandomDate};

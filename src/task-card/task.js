@@ -28,7 +28,9 @@ class Task extends MainTask {
   }
 
   set onEdit(fn) {
-    this._onEdit = fn;
+    if (typeof fn === `function`) {
+      this._onEdit = fn;
+    }
   }
 
   get template() {
