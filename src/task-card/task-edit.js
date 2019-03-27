@@ -25,12 +25,30 @@ class TaskEdit extends MainTask {
     this._onChangeFavorites = this._onChangeFavorites.bind(this);
     this._onAddTag = this._onAddTag.bind(this);
     this._onChangeText = this._onChangeText.bind(this);
+    this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
 
     this._state.isDate = false;
     this._state.isRepeated = this._isRepeated();
 
-    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onSubmit = null;
+    this._onDelete = null;
+  }
+
+  _onSubmitButtonClick(evt) {
+    evt.preventDefault();
+    if (typeof this._onSubmit === `function`) {
+      const formData = new FormData(this._element.querySelector(`.card__form`));
+      const newData = this._processForm(formData);
+      this._state.isDate = false;
+      this._onSubmit(newData);
+    }
+  }
+
+  _onDeleteButtonClick(evt) {
+    evt.preventDefault();
+    if (typeof this._onSubmit === `function`) {
+      this._onDelete();
+    }
   }
 
   _onChangeDate() {
@@ -68,7 +86,7 @@ class TaskEdit extends MainTask {
   _onChangeDateAndTime(el) {
     if (el.target.classList.contains(`card__date`)) {
       const [date, month] = el.target.value.split(` `);
-      this._dueDate = moment(this._dueDate).set({date, month}).toDate();
+      this._dueDate = moment(this._dueDate).set({date, month})._i;
       this._partialUpdate();
     }
     if (el.target.classList.contains(`card__time`)) {
@@ -80,7 +98,7 @@ class TaskEdit extends MainTask {
           hour += 12;
         }
       }
-      this._dueDate = moment(this._dueDate).set({minute, hour}).toDate();
+      this._dueDate = moment(this._dueDate).set({minute, hour})._i;
     }
   }
 
@@ -99,14 +117,6 @@ class TaskEdit extends MainTask {
 
   _onChangeText(el) {
     this._title = el.target.value;
-  }
-
-  _onSubmitButtonClick(evt) {
-    evt.preventDefault();
-    const formData = new FormData(this._element.querySelector(`.card__form`));
-    const newData = this._processForm(formData);
-    this._state.isDate = false;
-    this._onSubmit(newData);
   }
 
   _processForm(formData) {
@@ -153,6 +163,12 @@ class TaskEdit extends MainTask {
   set onSubmit(fn) {
     if (typeof fn === `function`) {
       this._onSubmit = fn;
+    }
+  }
+
+  set onDelete(fn) {
+    if (typeof fn === `function`) {
+      this._onDelete = fn;
     }
   }
 
@@ -258,6 +274,8 @@ ${this._title}</textarea
   bind() {
     this._element.querySelector(`.card__form`)
       .addEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__delete`)
+      .addEventListener(`click`, this._onDeleteButtonClick);
     this._element.querySelector(`.card__hashtag-list`).addEventListener(`click`, this._onDelTag);
     this._element.querySelector(`.card__colors-wrap`).addEventListener(`click`, this._onPickColor);
     this._element.querySelector(`.card__date-deadline-toggle`).addEventListener(`click`, this._onChangeDate);
@@ -278,6 +296,8 @@ ${this._title}</textarea
   unbind() {
     this._element.querySelector(`.card__form`)
       .removeEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__delete`)
+      .removeEventListener(`click`, this._onDeleteButtonClick);
     this._element.querySelector(`.card__hashtag-list`).removeEventListener(`click`, this._onDelTag);
     this._element.querySelector(`.card__colors-wrap`).removeEventListener(`click`, this._onPickColor);
     this._element.querySelector(`.card__date-deadline-toggle`).removeEventListener(`click`, this._onChangeDate);
