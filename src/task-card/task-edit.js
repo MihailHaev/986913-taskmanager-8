@@ -4,7 +4,7 @@ import moment from 'moment';
 import MainTask from './main-task';
 
 class TaskEdit extends MainTask {
-  constructor({title, dueDate, tags, picture, color, repeatingDays, isFavorite = false, isDone = false}) {
+  constructor({title, dueDate, tags, picture, color, repeatingDays, isFavorite = false, isDone = false, id}) {
     super();
     this._title = title;
     this._dueDate = dueDate;
@@ -14,6 +14,7 @@ class TaskEdit extends MainTask {
     this._repeatingDays = repeatingDays;
     this._isDone = isDone;
     this._isFavorite = isFavorite;
+    this._id = id;
 
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onChangeDate = this._onChangeDate.bind(this);
@@ -47,7 +48,7 @@ class TaskEdit extends MainTask {
   _onDeleteButtonClick(evt) {
     evt.preventDefault();
     if (typeof this._onSubmit === `function`) {
-      this._onDelete();
+      this._onDelete(this._id);
     }
   }
 
@@ -144,9 +145,7 @@ class TaskEdit extends MainTask {
         taskEditMapper[property](value);
       }
     }
-    if (!this._state.isDate) {
-      entry.dueDate = false;
-    }
+
     if (!this._state.isRepeated) {
       entry.repeatingDays = {mo: false,
         we: false,
@@ -311,6 +310,19 @@ ${this._title}</textarea
     if (this._state.isRepeated) {
       this._element.querySelector(`.card__repeat-days`).removeEventListener(`click`, this._onChangeRepeatedDay);
     }
+  }
+
+  delError() {
+    this._element.style.border = ``;
+  }
+
+  error() {
+    const ANIMATION_TIMEOUT = 600;
+    this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+    this._element.style.border = `4px solid red`;
+    setTimeout(() => {
+      this._element.style.animation = ``;
+    }, ANIMATION_TIMEOUT);
   }
 
   static createMapper(target) {

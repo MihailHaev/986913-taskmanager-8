@@ -11,7 +11,7 @@ class MainTask extends Component {
   }
 
   _isDeadLine() {
-    return this._state.isDate && this._dueDate < Date.now();
+    return this._state.isDate && this._dueDate < new Date();
   }
 
   _addTags() {
