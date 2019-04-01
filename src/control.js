@@ -2,13 +2,21 @@ import flatpickr from 'flatpickr';
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import createElement from './element';
 
 const tasksContainer = document.querySelector(`.board__tasks`);
 const statisticContainer = document.querySelector(`.statistic`);
 const statisticTagsWrap = document.querySelector(`.statistic__tags-wrap`);
 const statisticColorWrap = document.querySelector(`.statistic__colors-wrap`);
-const tagsCtx = document.querySelector(`.statistic__tags`);
-const colorsCtx = document.querySelector(`.statistic__colors`);
+let tagsCtx = document.querySelector(`.statistic__tags`);
+let colorsCtx = document.querySelector(`.statistic__colors`);
+let itHaveChart = false;
+
+const reloadCanvas = (ctx, addedClass) => {
+  ctx.remove();
+  ctx = createElement(`<canvas class="statistic__${addedClass}" width="400" height="300"></canvas>`);
+  return ctx;
+};
 
 export const openTasks = () => {
   tasksContainer.classList.remove(`visually-hidden`);
@@ -97,6 +105,13 @@ export const openStatistic = (tasks) => {
       }
     }
   }
+  if (itHaveChart) {
+    tagsCtx = reloadCanvas(tagsCtx, `tags`);
+    statisticTagsWrap.appendChild(tagsCtx);
+
+    colorsCtx = reloadCanvas(colorsCtx, `colors`);
+    statisticColorWrap.appendChild(colorsCtx);
+  }
 
   const tagsChart = new Chart(tagsCtx, {
     plugins: [ChartDataLabels],
@@ -152,7 +167,6 @@ export const openStatistic = (tasks) => {
     }
   });
 
-  // В разрезе цветов
   const colorsChart = new Chart(colorsCtx, {
     plugins: [ChartDataLabels],
     type: `pie`,
@@ -206,6 +220,7 @@ export const openStatistic = (tasks) => {
       }
     }
   });
+  itHaveChart = true;
 };
 
 flatpickr(`.statistic__period-input`, {altInput: true, altFormat: `d M`, mode: `range`, dateFormat: `d M`, locale: {rangeSeparator: ` - `}, weekNumbers: true});
@@ -214,7 +229,3 @@ const weekStart = moment().startOf(`week`).format(`DD MMM`);
 const weekEnd = moment().endOf(`week`).format(`DD MMM`);
 statisticInput.placeholder = `${weekStart} - ${weekEnd}`;
 
-tagsCtx.style.height = `300px`;
-tagsCtx.style.width = `400px`;
-colorsCtx.style.height = `300px`;
-colorsCtx.style.width = `400px`;

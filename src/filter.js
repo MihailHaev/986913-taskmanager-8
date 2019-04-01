@@ -25,7 +25,7 @@ class Filter extends Component {
   }
 
   get template() {
-    return `<div><input
+    return `<input
     type="radio"
     id="filter__${this._caption.toLowerCase()}"
     class="filter__input visually-hidden"
@@ -37,7 +37,7 @@ class Filter extends Component {
       for="filter__${this._caption.toLowerCase()}"
       class="filter__label">
     ${this._caption} <span class="filter__${this._caption.toLowerCase()}-count">${this._amount}</span></label
-    ></div>`.trim();
+    >`.trim();
   }
 
   bind() {

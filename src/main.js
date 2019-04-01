@@ -1,34 +1,24 @@
 import {getRandomInt} from './random-values';
 import Task from './task-card/task';
 import TaskEdit from './task-card/task-edit';
-import makeTasksData from './task-card/data';
 import moment from 'moment';
 import Filter from './filter';
 import {openStatistic, openTasks} from './control';
+import API from './task-card/api';
 
-const tasksContainer = document.querySelector(`.board__tasks`);
-const filtersContainer = document.querySelector(`.main__filter`);
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
+const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
+
+const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
+
 const statisticButton = document.querySelector(`#control__statistic`);
 const tasksButton = document.querySelector(`#control__task`);
-
-const initailDataTask = makeTasksData(7);
 
 const filtersCaptions = [`All`,
   `Overdue`, `Today`,
   `Favorites`, `Repeating`,
   `Tags`, `Archive`
 ];
-
-const updateTask = (dataTasks, dataToUpdate, newData) => {
-  const i = dataTasks.indexOf(dataToUpdate);
-  dataTasks[i] = Object.assign({}, dataTasks[i], newData);
-  return dataTasks[i];
-};
-
-const deleteTask = (dataTasks, dataToRemove) => {
-  const i = dataTasks.indexOf(dataToRemove);
-  dataTasks.splice(i, 1);
-};
 
 const filterTasks = (dataTasks, filterName) => {
   switch (filterName) {
@@ -55,7 +45,8 @@ const filterTasks = (dataTasks, filterName) => {
   return dataTasks;
 };
 
-const renderFilters = (filtersNames, container) => {
+const renderFilters = (filtersNames) => {
+  const container = document.querySelector(`.main__filter`);
   container.innerHTML = ``;
   for (let nameOfFilter of filtersNames) {
     const filterComponent = new Filter(nameOfFilter, getRandomInt(0, 15), (nameOfFilter === `All`));
@@ -64,17 +55,29 @@ const renderFilters = (filtersNames, container) => {
 
     filterComponent.onFilter = (evt) => {
       const filterName = evt.target.id;
-      const filteredTasks = filterTasks(initailDataTask, filterName);
-      renderTasks(filteredTasks, tasksContainer);
+      api.getTasks()
+        .then((tasks) => {
+          const filteredTasks = filterTasks(tasks, filterName);
+          renderTasks(filteredTasks);
+        });
     };
   }
 };
 
-const renderTasks = (dataTasks, container) => {
+const renderTasks = (tasks) => {
+  const container = document.querySelector(`.board__tasks`);
+  const boardNoTasks = document.querySelector(`.board__no-tasks`);
+
+  boardNoTasks.textContent = `Congratulations, all tasks were completed! To create a new click on
+  «add new task» button.`;
+  if (tasks.length !== 0) {
+    boardNoTasks.classList.add(`visually-hidden`);
+  }
+
   container.innerHTML = ``;
-  for (let data of dataTasks) {
-    const taskComponent = new Task(data);
-    const editTaskComponent = new TaskEdit(data);
+  for (let task of tasks) {
+    const taskComponent = new Task(task);
+    const editTaskComponent = new TaskEdit(task);
 
     container.appendChild(taskComponent.render(container));
 
@@ -85,29 +88,93 @@ const renderTasks = (dataTasks, container) => {
     };
 
     editTaskComponent.onSubmit = (newData) => {
-      const updatedTask = updateTask(dataTasks, data, newData);
+      const buttonSave = editTaskComponent.element.querySelector(`.card__save`);
+      const buttonDel = editTaskComponent.element.querySelector(`.card__delete`);
+      editTaskComponent.delError();
+      const block = () => {
+        buttonSave.disabled = true;
+        buttonDel.disabled = true;
+        buttonSave.textContent = `Saving...`;
+      };
+      const unblock = () => {
+        buttonSave.disabled = false;
+        buttonDel.disabled = false;
+        buttonSave.textContent = `save`;
+      };
 
-      taskComponent.update(updatedTask);
-      taskComponent.render(container);
-      container.replaceChild(taskComponent.element, editTaskComponent.element);
-      editTaskComponent.unrender();
+      block();
+
+      for (let key in newData) {
+        if (newData.hasOwnProperty(key)) {
+          task[key] = newData[key];
+        }
+      }
+      api.update({id: task.d, data: task.toRAW()})
+        .then((newTask) => {
+          taskComponent.update(newTask);
+          taskComponent.render();
+          container.replaceChild(taskComponent.element, editTaskComponent.element);
+
+          editTaskComponent.unrender();
+          unblock();
+        })
+        .catch(() => {
+          unblock();
+          editTaskComponent.error();
+        });
     };
 
-    editTaskComponent.onDelete = () => {
-      deleteTask(dataTasks, data);
-      container.removeChild(editTaskComponent.element);
-      editTaskComponent.unrender();
+    editTaskComponent.onDelete = (id) => {
+      editTaskComponent.delError();
+      const buttonSave = editTaskComponent.element.querySelector(`.card__save`);
+      const buttonDel = editTaskComponent.element.querySelector(`.card__delete`);
+      editTaskComponent.delError();
+      const block = () => {
+        buttonSave.disabled = true;
+        buttonDel.disabled = true;
+        buttonSave.textContent = `Deleting...`;
+      };
+      const unblock = () => {
+        buttonSave.disabled = false;
+        buttonDel.disabled = false;
+        buttonSave.textContent = `delete`;
+      };
+
+      block();
+
+      api.delete({id})
+      .then(() => api.getTasks())
+      .then((tasksNew) => {
+        renderTasks(tasksNew);
+      })
+      .catch(() => {
+        unblock();
+        editTaskComponent.error();
+      });
     };
   }
 };
 
-renderFilters(filtersCaptions, filtersContainer);
-renderTasks(initailDataTask, tasksContainer);
+renderFilters(filtersCaptions);
+
+api.getTasks()
+  .then((tasks) => {
+    renderTasks(tasks);
+  })
+  .catch(() => {
+    document.querySelector(`.board__no-tasks`).textContent = `Something went wrong while loading your tasks. Check your connection or try again later`;
+  });
 
 statisticButton.addEventListener(`change`, () => {
-  openStatistic(initailDataTask);
+  api.getTasks()
+  .then((tasks) => {
+    openStatistic(tasks);
+  });
 });
 tasksButton.addEventListener(`change`, openTasks);
 document.querySelector(`.statistic__period-input`).addEventListener(`change`, () => {
-  openStatistic(initailDataTask);
+  api.getTasks()
+  .then((tasks) => {
+    openStatistic(tasks);
+  });
 });
