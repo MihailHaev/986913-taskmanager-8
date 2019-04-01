@@ -167,7 +167,6 @@ export const openStatistic = (tasks) => {
     }
   });
 
-  // В разрезе цветов
   const colorsChart = new Chart(colorsCtx, {
     plugins: [ChartDataLabels],
     type: `pie`,

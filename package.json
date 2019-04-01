@@ -1,6 +1,6 @@
 {
   "name": "TaskManager",
-  "version": "1.0.7",
+  "version": "1.8.1",
   "private": true,
   "description": "Личный проект «Менеджер задач» от HTML Academy",
   "scripts": {
