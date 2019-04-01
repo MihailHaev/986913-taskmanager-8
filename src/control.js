@@ -7,8 +7,21 @@ const tasksContainer = document.querySelector(`.board__tasks`);
 const statisticContainer = document.querySelector(`.statistic`);
 const statisticTagsWrap = document.querySelector(`.statistic__tags-wrap`);
 const statisticColorWrap = document.querySelector(`.statistic__colors-wrap`);
-const tagsCtx = document.querySelector(`.statistic__tags`);
-const colorsCtx = document.querySelector(`.statistic__colors`);
+let tagsCtx = document.querySelector(`.statistic__tags`);
+let colorsCtx = document.querySelector(`.statistic__colors`);
+let tagsChart;
+let colorsChart;
+
+flatpickr(`.statistic__period-input`, {altInput: true, altFormat: `d M`, mode: `range`, dateFormat: `d M`, locale: {rangeSeparator: ` - `}, weekNumbers: true});
+const statisticInput = document.querySelector(`.statistic__period-input[type="text"]`);
+const weekStart = moment().startOf(`week`).format(`DD MMM`);
+const weekEnd = moment().endOf(`week`).format(`DD MMM`);
+statisticInput.placeholder = `${weekStart} - ${weekEnd}`;
+
+tagsCtx.style.height = `300px`;
+tagsCtx.style.width = `400px`;
+colorsCtx.style.height = `300px`;
+colorsCtx.style.width = `400px`;
 
 export const openTasks = () => {
   tasksContainer.classList.remove(`visually-hidden`);
@@ -31,14 +44,34 @@ export const openStatistic = (tasks) => {
       return (start <= dayOfTask && end >= dayOfTask);
     });
   } else if (periodValue === ``) {
-    const weekStart = moment().startOf(`week`).toDate();
-    const weekEnd = moment().endOf(`week`).toDate();
+    const weekStartPeriod = moment().startOf(`week`).toDate();
+    const weekEndPeriod = moment().endOf(`week`).toDate();
     tasks = tasks.filter((task) => {
       const dayOfTask = moment(task.dueDate).toDate();
-      return (weekStart <= dayOfTask && weekEnd >= dayOfTask);
+      return (weekStartPeriod <= dayOfTask && weekEndPeriod >= dayOfTask);
     });
   } else {
     return;
+  }
+
+  if (tagsChart && colorsChart) {
+    tagsCtx.remove();
+    tagsCtx = document.createElement(`canvas`);
+    tagsCtx.classList.add(`statistic__tags`);
+    tagsCtx.classList.add(`chartjs-render-monitor`);
+    tagsCtx.style.height = `300px`;
+    tagsCtx.style.width = `400px`;
+    tagsCtx.style.display = `block`;
+    statisticTagsWrap.appendChild(tagsCtx);
+
+    colorsCtx.remove();
+    colorsCtx = document.createElement(`canvas`);
+    colorsCtx.classList.add(`statistic__tags`);
+    colorsCtx.classList.add(`chartjs-render-monitor`);
+    colorsCtx.style.height = `300px`;
+    colorsCtx.style.width = `400px`;
+    colorsCtx.style.display = `block`;
+    statisticColorWrap.appendChild(colorsCtx);
   }
 
   const tags = {};
@@ -98,7 +131,7 @@ export const openStatistic = (tasks) => {
     }
   }
 
-  const tagsChart = new Chart(tagsCtx, {
+  tagsChart = new Chart(tagsCtx, {
     plugins: [ChartDataLabels],
     type: `pie`,
     data: {
@@ -153,7 +186,7 @@ export const openStatistic = (tasks) => {
   });
 
   // В разрезе цветов
-  const colorsChart = new Chart(colorsCtx, {
+  colorsChart = new Chart(colorsCtx, {
     plugins: [ChartDataLabels],
     type: `pie`,
     data: {
@@ -207,14 +240,3 @@ export const openStatistic = (tasks) => {
     }
   });
 };
-
-flatpickr(`.statistic__period-input`, {altInput: true, altFormat: `d M`, mode: `range`, dateFormat: `d M`, locale: {rangeSeparator: ` - `}, weekNumbers: true});
-const statisticInput = document.querySelector(`.statistic__period-input[type="text"]`);
-const weekStart = moment().startOf(`week`).format(`DD MMM`);
-const weekEnd = moment().endOf(`week`).format(`DD MMM`);
-statisticInput.placeholder = `${weekStart} - ${weekEnd}`;
-
-tagsCtx.style.height = `300px`;
-tagsCtx.style.width = `400px`;
-colorsCtx.style.height = `300px`;
-colorsCtx.style.width = `400px`;

@@ -58,7 +58,7 @@ const filterTasks = (dataTasks, filterName) => {
 const renderFilters = (filtersNames, container) => {
   container.innerHTML = ``;
   for (let nameOfFilter of filtersNames) {
-    const filterComponent = new Filter(nameOfFilter, getRandomInt(0, 15), (nameOfFilter === `All`));
+    const filterComponent = new Filter(nameOfFilter, getRandomInt(0, 15), (filtersNames.indexOf(nameOfFilter) === 0));
 
     container.appendChild(filterComponent.render(container));
 

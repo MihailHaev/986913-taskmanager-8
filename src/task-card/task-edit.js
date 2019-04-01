@@ -46,7 +46,7 @@ class TaskEdit extends MainTask {
 
   _onDeleteButtonClick(evt) {
     evt.preventDefault();
-    if (typeof this._onSubmit === `function`) {
+    if (typeof this._onDelete === `function`) {
       this._onDelete();
     }
   }
