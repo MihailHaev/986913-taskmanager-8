@@ -90,7 +90,7 @@ const renderTasks = (tasks) => {
     editTaskComponent.onSubmit = (newData) => {
       const buttonSave = editTaskComponent.element.querySelector(`.card__save`);
       const buttonDel = editTaskComponent.element.querySelector(`.card__delete`);
-      editTaskComponent.delError();
+      
       const block = () => {
         buttonSave.disabled = true;
         buttonDel.disabled = true;
@@ -102,6 +102,7 @@ const renderTasks = (tasks) => {
         buttonSave.textContent = `save`;
       };
 
+      editTaskComponent.delError();
       block();
 
       for (let key in newData) {
@@ -109,7 +110,7 @@ const renderTasks = (tasks) => {
           task[key] = newData[key];
         }
       }
-      api.update({id: task.d, data: task.toRAW()})
+      api.update({id: task.id, data: task.toRAW()})
         .then((newTask) => {
           taskComponent.update(newTask);
           taskComponent.render();
@@ -125,10 +126,8 @@ const renderTasks = (tasks) => {
     };
 
     editTaskComponent.onDelete = (id) => {
-      editTaskComponent.delError();
       const buttonSave = editTaskComponent.element.querySelector(`.card__save`);
       const buttonDel = editTaskComponent.element.querySelector(`.card__delete`);
-      editTaskComponent.delError();
       const block = () => {
         buttonSave.disabled = true;
         buttonDel.disabled = true;
@@ -139,7 +138,7 @@ const renderTasks = (tasks) => {
         buttonDel.disabled = false;
         buttonSave.textContent = `delete`;
       };
-
+      editTaskComponent.delError();
       block();
 
       api.delete({id})
