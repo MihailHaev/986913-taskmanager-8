@@ -24,7 +24,7 @@ class Provider {
       const rawTasks = objectToArray(rawTaskMap);
       const tasks = ModelTask.parseTasks(rawTasks);
 
-      return tasks;
+      return Promise.resolve(tasks);
     }
   }
 
