@@ -4,12 +4,28 @@ import TaskEdit from './task-card/task-edit';
 import moment from 'moment';
 import Filter from './filter';
 import {openStatistic, openTasks} from './control';
-import API from './task-card/api';
+import API from './api';
+import Provider from './provider';
+import Store from './task-card/store';
+
 
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
 const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
+const TASKS_STORE_KEY = `tasks-store-key`;
+
+const generateId = () => (Date.now() + Math.random());
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
+const store = new Store({key: TASKS_STORE_KEY, storage: localStorage});
+const provider = new Provider({api, store, generateId});
+
+window.addEventListener(`offline`, function () {
+  document.title = `${document.title}[OFFLINE]`;
+});
+window.addEventListener(`online`, () => {
+  document.title = document.title.split(`[OFFLINE]`)[0];
+  provider.syncTasks();
+});
 
 const statisticButton = document.querySelector(`#control__statistic`);
 const tasksButton = document.querySelector(`#control__task`);
@@ -55,7 +71,7 @@ const renderFilters = (filtersNames) => {
 
     filterComponent.onFilter = (evt) => {
       const filterName = evt.target.id;
-      api.getTasks()
+      provider.getTasks()
         .then((tasks) => {
           const filteredTasks = filterTasks(tasks, filterName);
           renderTasks(filteredTasks);
@@ -109,7 +125,7 @@ const renderTasks = (tasks) => {
           task[key] = newData[key];
         }
       }
-      api.update({id: task.d, data: task.toRAW()})
+      provider.update({id: task.id, data: task.toRAW()})
         .then((newTask) => {
           taskComponent.update(newTask);
           taskComponent.render();
@@ -142,8 +158,8 @@ const renderTasks = (tasks) => {
 
       block();
 
-      api.delete({id})
-      .then(() => api.getTasks())
+      provider.delete({id})
+      .then(() => provider.getTasks())
       .then((tasksNew) => {
         renderTasks(tasksNew);
       })
@@ -157,7 +173,7 @@ const renderTasks = (tasks) => {
 
 renderFilters(filtersCaptions);
 
-api.getTasks()
+provider.getTasks()
   .then((tasks) => {
     renderTasks(tasks);
   })
@@ -166,14 +182,14 @@ api.getTasks()
   });
 
 statisticButton.addEventListener(`change`, () => {
-  api.getTasks()
+  provider.getTasks()
   .then((tasks) => {
     openStatistic(tasks);
   });
 });
 tasksButton.addEventListener(`change`, openTasks);
 document.querySelector(`.statistic__period-input`).addEventListener(`change`, () => {
-  api.getTasks()
+  provider.getTasks()
   .then((tasks) => {
     openStatistic(tasks);
   });
