@@ -1,24 +1,28 @@
-import {getRandomInt} from './random-values';
-import Task from './task-card/task';
-import TaskEdit from './task-card/task-edit';
-import moment from 'moment';
-import Filter from './filter';
-import {openStatistic, openTasks} from './control';
-import API from './api';
-import Provider from './provider';
-import Store from './task-card/store';
+import {getRandomInt} from "./random-values";
+import Task from "./task-card/task";
+import TaskEdit from "./task-card/task-edit";
+import moment from "moment";
+import Filter from "./filter";
+import {openStatistic, openTasks} from "./control";
+import API from "./api";
+import Provider from "./provider";
+import Store from "./task-card/store";
 
 
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
 const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
 const TASKS_STORE_KEY = `tasks-store-key`;
 
-const generateId = () => (Date.now() + Math.random());
-
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 const store = new Store({key: TASKS_STORE_KEY, storage: localStorage});
-const provider = new Provider({api, store, generateId});
+const provider = new Provider({api, store, generateId: () => (Date.now() + Math.random())});
 
+if (window.navigator.onLine) {
+  document.title = document.title.split(`[OFFLINE]`)[0];
+  provider.syncTasks();
+} else {
+  document.title = `${document.title}[OFFLINE]`;
+}
 window.addEventListener(`offline`, function () {
   document.title = `${document.title}[OFFLINE]`;
 });
@@ -172,7 +176,7 @@ const renderTasks = (tasks) => {
 };
 
 renderFilters(filtersCaptions);
-
+console.log(provider.getTasks());
 provider.getTasks()
   .then((tasks) => {
     renderTasks(tasks);
